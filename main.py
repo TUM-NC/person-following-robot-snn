@@ -4,7 +4,6 @@ import random
 import numpy as np
 import configparser
 import matplotlib.pyplot as plt
-from brian2 import ms
 
 from neural_network.visualization import i_off_snn
 from simulation.simulation import Simulation
@@ -53,7 +52,7 @@ def train(weights_file_name_cann: str = None, weights_file_name_dist: str = None
         snn.set_input_spikes(indices_sim, times_sim)
 
         """ 4. Run the SNN and get output velocities"""
-        snn.run_simulation()
+        snn.run_simulation(step=step)
         v_left, v_right = snn.get_predicted_velocity(step)
 
         """ 5. Simulate the vehicle movement with the calculated speed """
@@ -91,9 +90,6 @@ def train(weights_file_name_cann: str = None, weights_file_name_dist: str = None
         print("step:", step, "v_l:", v_veh_l, "v_r:", v_veh_r, "reward_v_l:", round(l_v_left, 10),
               "reward_v_r:", round(l_v_right, 10), "reward_d_l:", round(l_d_left, 10),
               "reward_d_r:", round(l_d_right, 10))
-
-        """ 8. Update the plotted data in the in the SNN plot """
-        snn.plot_data(step, (indices_sim, times_sim * ms), plotting_interval=1)
 
 
 def reach_goal_reset(step: int):
@@ -146,7 +142,7 @@ def test(weights_file_name_cann: str, weights_file_name_dist: str, i_steps: int)
         snn.set_input_spikes(indices_sim, times_sim)
 
         """ 4. Run the SNN and get output velocities"""
-        snn.run_simulation()
+        snn.run_simulation(step=step)
         v_left, v_right = snn.get_predicted_velocity(step)
         # v_left, v_right = _bound_speed(v_left, v_right)
 
@@ -161,8 +157,6 @@ def test(weights_file_name_cann: str, weights_file_name_dist: str, i_steps: int)
         v_vehicle_l = simulation.robot_simulation.v_left
         v_vehicle_r = simulation.robot_simulation.v_right
 
-        """ 7. Update the plotted data in the in the SNN plot """
-        snn.plot_data(step, (indices_sim, times_sim * ms), plotting_interval=5)
         print("step:", step, "v_left:", v_vehicle_l, "v_right:", v_vehicle_r, v_left, v_right)
 
         change = random.randint(0, 2)
@@ -197,8 +191,8 @@ if __name__ == '__main__':
         if test_network:
             iteration_steps = int(config['setup']['test_steps'])
             reward_left, reward_right = list(range(iteration_steps)), list(range(iteration_steps))
-            test(weights_file_name_cann="weights_run_cann4.txt",
-                 weights_file_name_dist="weights_run_dist4.txt",
+            test(weights_file_name_cann=config['setup']['name_cann_weights'],
+                 weights_file_name_dist=config['setup']['name_dist_weights'],
                  i_steps=iteration_steps)
         elif train_network:
             reward_left, reward_right = list(range(20000)), list(range(20000))

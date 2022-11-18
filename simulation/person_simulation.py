@@ -26,12 +26,12 @@ class PersonSimulation:
         These parameters can be defined in the config file:
 
         person_velocity: in m/s
-        turn_angle_time_step: angle the person can turn in each time step
+        turn_angle_time_step: angle the person can turn in each time step in degrees
         turn_probability: probability that the person walking will make a turn in this step
         min_wait_turn_steps: minimum amount of steps to wait after a complete turn
         min_turn_angle: the minimum angle the person can turn before walking forward again
         max_turn_angle: the maximum angle the person can turn before walking forward again
-        fps: number of frames per second from the FMCW radar --> indicates how long to sample spikes
+        fps: number of frames per second from the FMCW radar --> simulation step time
 
         :param robot_simulation: to get the position of the robot
         :param config: the config file

@@ -23,9 +23,9 @@ class Simulation:
         # get all the parameters from the init file
         self._number_neurons_y = int(config['CANN']['number_neurons_y'])
 
-        self._reward_scaler_cann_x = float(config['reward_cann']['scaler_x'])
-        self._reward_scaler_cann_y = float(config['reward_cann']['scaler_y'])
-        self._reward_scaler_distance = float(config['reward_distance']['scaler'])
+        self._reward_scaler_cann_x = float(config['reward.cann']['scaler_x'])
+        self._reward_scaler_cann_y = float(config['reward.cann']['scaler_y'])
+        self._reward_scaler_distance = float(config['reward.distance']['scaler'])
 
         self._distance_to_person_x = float(config['simulation']['desired_distance_person_x'])
         self._distance_to_person_y = float(config['simulation']['desired_distance_person_y'])
@@ -34,13 +34,16 @@ class Simulation:
         self._starting_pos_person_angle = float(config['setup']['starting_pos_person_angle'])
         self._ratio_radius = float(config['CANN']['ratio_radius'])
 
+        self._show_simulation_visualization = config.getboolean(section='setup', option='show_simulation_visualization')
+
         self.previous_reward_left = 0
         self.previous_reward_right = 0
 
         self.robot_simulation = RobotSimulation(config=config)
         self.person_simulation = PersonSimulation(self.robot_simulation, config=config)
         self.cann_simulation = CANNSimulation(config=config)
-        self.visualization = Visualization(config=config)
+        if self._show_simulation_visualization:
+            self.visualization = Visualization(config=config)
 
     def animate_next_step(self, step: int) -> bool:
         """
@@ -48,16 +51,17 @@ class Simulation:
         :param step: how often the simulation was run
         """
         self.person_simulation.simulate_person_movement()
-        self.visualization.update(step=step,
-                                  cartesian_path_person_adapted=self.person_simulation.get_cartesian_path_adapted(),
-                                  polar_path_person=self.person_simulation.get_polar_path_adapted(),
-                                  cartesian_path_robot=self.robot_simulation.path,
-                                  cartesian_path_person=self.person_simulation.path_cartesian,
-                                  cann_spikes=self.cann_simulation.previous_spikes_probability,
-                                  angle_person=self.person_simulation.current_angle,
-                                  angle_robot=self.robot_simulation.current_angle,
-                                  v_robot=(self.robot_simulation.v_left + self.robot_simulation.v_right) / 2,
-                                  v_person=self.person_simulation.person_velocity)
+        if self._show_simulation_visualization:
+            self.visualization.update(step=step,
+                                      cartesian_path_person_adapted=self.person_simulation.get_cartesian_path_adapted(),
+                                      polar_path_person=self.person_simulation.get_polar_path_adapted(),
+                                      cartesian_path_robot=self.robot_simulation.path,
+                                      cartesian_path_person=self.person_simulation.path_cartesian,
+                                      cann_spikes=self.cann_simulation.previous_spikes_probability,
+                                      angle_person=self.person_simulation.current_angle,
+                                      angle_robot=self.robot_simulation.current_angle,
+                                      v_robot=(self.robot_simulation.v_left + self.robot_simulation.v_right) / 2,
+                                      v_person=self.person_simulation.person_velocity)
 
         if self._stop_animation():
             return True
@@ -129,7 +133,7 @@ class Simulation:
                                                     noise_index=noise_index,
                                                     noise_time=noise_time)
 
-    def set_path(self, x: List, y: List) -> None:
+    def set_path(self, x: np.ndarray, y: np.ndarray) -> None:
         """
         Function sets a path the person has to follow
         :param x: cartesian x coordinates for the path in meters
@@ -173,6 +177,8 @@ class Simulation:
         self.cann_simulation.simulate_spikes(step=0, angle=angle, radius=radius)
         self.person_simulation.reset(x=x, y=y)
 
+        if not self._show_simulation_visualization:
+            return
         self.visualization.update(step=0,
                                   cartesian_path_person_adapted=self.person_simulation.get_cartesian_path_adapted(),
                                   polar_path_person=self.person_simulation.get_polar_path_adapted(),

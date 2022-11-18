@@ -23,11 +23,10 @@ class Visualization:
         initiates all the figures
         :param config: the config file with parameters for the simulation
         """
-
         self._cann_neurons_x = int(config['CANN']['number_neurons_x'])
         self._cann_neurons_y = int(config['CANN']['number_neurons_y'])
         self._ratio_radius = float(config['CANN']['ratio_radius'])
-        self._update_rate = float(config['setup']['simulation_update_rate'])
+        self._update_rate = float(config['setup']['simulation_visualization_update_rate'])
 
         self._figure = plt.figure(figsize=(7, 6), facecolor='#FFFFFF')
         plt.rcParams.update({'font.size': 7})
@@ -89,6 +88,7 @@ class Visualization:
 
         plt.ion()
         plt.tight_layout()
+        plt.show()
 
     def update(self,
                step: int,
