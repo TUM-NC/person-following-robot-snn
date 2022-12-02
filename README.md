@@ -28,6 +28,11 @@ like the reward and input data.<br>
 The **main.py** file can be seen as the entry point as it contains a function for testing
 and training of the network, which should also be executed to run everything.
 
+![](./images-md/simulation-visualization.png "Visualtization of the Simulation Environment")
+*Visualtization of the Simulation Environment*
+![](./images-md/simulation-visualization.png "Visualtization of the SNNs input, output and internal state")
+*Visualtization of the SNNs input, output and internal state*
+
 ### Dependencies 
 These are the dependencies which are needed for the network and simulation environment:
 
